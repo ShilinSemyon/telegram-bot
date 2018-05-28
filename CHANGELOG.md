@@ -9,6 +9,8 @@
   __Breaking changes__:
     - `telegram/bot/rspec/integration` is moved to `telegram/bot/rspec/integration/rails`.
     - `:telegram_bot` rspec tag is replaced with `telegram_bot: :rails`.
+- __Breaking change__. Use bang-methods as actions for commands.
+  This prevents calling context contextual actions and payload specific actions with commands.
 
 # 0.13.1
 
