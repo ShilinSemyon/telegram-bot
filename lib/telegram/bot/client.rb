@@ -30,7 +30,7 @@ module Telegram
           body = body.dup
           body.each do |k, val|
             body[k] = val.to_json if val.is_a?(Hash) || val.is_a?(Array)
-          end
+          end.to_json
         end
 
         def prepare_async_args(action, body = {})
@@ -39,13 +39,13 @@ module Telegram
 
         def error_for_response(response)
           result = JSON.parse(response.body) rescue nil # rubocop:disable RescueModifier
-          return Error.new(response.reason) unless result
+          return Error.new(response) unless result
           message = result['description'] || '-'
           # This errors are raised only for valid responses from Telegram
           case response.status
           when 403 then Forbidden.new(message)
           when 404 then NotFound.new(message)
-          else Error.new("#{response.reason}: #{message}")
+          else Error.new("#{response}: #{message}")
           end
         end
       end
@@ -53,14 +53,14 @@ module Telegram
       attr_reader :client, :token, :username, :base_uri
 
       def initialize(token = nil, username = nil, **options)
-        @client = HTTPClient.new
+        @client = Telegram::Bot::Adapter.new.client
         @token = token || options[:token]
         @username = username || options[:username]
         @base_uri = format(URL_TEMPLATE, token: self.token)
       end
 
       def request(action, body = {})
-        response = http_request("#{base_uri}#{action}", self.class.prepare_body(body))
+        response = http_request("/bot#{@token}/#{action}", self.class.prepare_body(body))
         raise self.class.error_for_response(response) if response.status >= 300
         JSON.parse(response.body)
       end

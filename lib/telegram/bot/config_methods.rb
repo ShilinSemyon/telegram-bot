@@ -54,6 +54,7 @@ module Telegram
           if defined?(Rails.application)
             app = Rails.application
             store = app.respond_to?(:credentials) ? app.credentials : app.secrets
+            Telegram::Bot::Adapter.config(store.fetch(:proxy, {}).with_indifferent_access)
             secrets = store.fetch(:telegram, {}).with_indifferent_access
             secrets.fetch(:bots, {}).symbolize_keys.tap do |config|
               default = secrets[:bot]

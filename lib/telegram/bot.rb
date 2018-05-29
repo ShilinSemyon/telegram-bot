@@ -21,6 +21,8 @@ module Telegram
       end
     end
 
+    autoload :Socks5,             'telegram/bot/connection/socks5'
+    autoload :Adapter,            'telegram/bot/connection/adapter'
     autoload :Async,              'telegram/bot/async'
     autoload :Botan,              'telegram/bot/botan'
     autoload :Client,             'telegram/bot/client'
