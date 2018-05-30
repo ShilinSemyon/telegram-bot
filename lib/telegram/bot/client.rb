@@ -26,11 +26,12 @@ module Telegram
         end
 
         # Encodes nested hashes as json.
-        def prepare_body(body)
+        def prepare_body(body, client = nil)
           body = body.dup
           body.each do |k, val|
             body[k] = val.to_json if val.is_a?(Hash) || val.is_a?(Array)
-          end.to_json
+            end
+          client.is_a?(HTTPClient) ? body : body.to_json
         end
 
         def prepare_async_args(action, body = {})
@@ -60,7 +61,8 @@ module Telegram
       end
 
       def request(action, body = {})
-        response = http_request("/bot#{@token}/#{action}", self.class.prepare_body(body))
+        uri = @client.is_a?(HTTPClient) ? "#{@base_uri}#{action}" : "/bot#{@token}/#{action}"
+        response = http_request(uri, self.class.prepare_body(body, @client))
         raise self.class.error_for_response(response) if response.status >= 300
         JSON.parse(response.body)
       end

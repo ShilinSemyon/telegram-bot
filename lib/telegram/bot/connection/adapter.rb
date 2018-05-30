@@ -1,4 +1,5 @@
 require 'faraday'
+require 'httpclient'
 
 module Telegram
   module Bot
@@ -63,11 +64,7 @@ module Telegram
       private
 
       def set_default_connection
-        ::Faraday.new(url: 'https://api.telegram.org', ssl: {verify: false}) do |faraday|
-          faraday.request :multipart
-          faraday.request :url_encoded
-          faraday.adapter ::Faraday.default_adapter
-        end
+        HTTPClient.new
       end
 
       def set_http_proxy_connection
